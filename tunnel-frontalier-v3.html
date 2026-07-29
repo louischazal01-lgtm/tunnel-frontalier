@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Devenir frontalier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000;
+  --surface:#161616;
+  --surface-hi:#1E1E1E;
+  --border:#2C2C2C;
+  --gold:#D0A03E;
+  --gold-hi:#E0B054;
+  --gold-dim:#7A5E24;
+  --text:#fff;
+  --muted:#8E8E8E;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:"Inter",system-ui,-apple-system,sans-serif;
+  font-size:17px;line-height:1.45;
+  display:flex;justify-content:center;
+}
+.shell{width:100%;max-width:600px;min-height:100dvh;display:flex;flex-direction:column}
+
+.topbar{
+  position:sticky;top:0;z-index:3;background:var(--bg);
+  padding:18px 16px 14px;display:flex;align-items:center;gap:10px;min-height:80px;
+}
+.back{
+  flex:none;width:48px;height:48px;border-radius:14px;
+  background:#1C1C1C;border:1px solid #2A2A2A;color:#fff;
+  font-size:19px;cursor:pointer;display:grid;place-items:center;
+}
+.back:hover{background:#242424}
+.back[hidden]{display:none}
+.phases{display:flex;align-items:center;background:#111;border-radius:999px;padding:9px 18px}
+.node{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;transition:.35s}
+.node.todo{background:#0A0A0A;border:1px solid #232323}
+.node.now{border:2.5px solid var(--gold);background:transparent}
+.node.now::after{content:"";width:11px;height:11px;border-radius:50%;background:var(--gold)}
+.node.done{background:var(--gold-dim)}
+.node.done::after{content:"";width:11px;height:9px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-2px)}
+.link{width:46px;height:2px;background:#232323;transition:.35s}
+.link.done{background:var(--gold-dim)}
+.phase-label{margin-left:14px;color:var(--gold);font-size:14.5px;font-weight:500;line-height:1.15;max-width:88px}
+
+main{flex:1;padding:14px 22px 46px;position:relative;z-index:1}
+.step{animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.step{animation:none}}
+
+h1{font-size:clamp(31px,8.4vw,42px);font-weight:700;line-height:1.08;letter-spacing:-.03em;margin-bottom:18px}
+h2{font-size:clamp(21px,5.4vw,25px);font-weight:600;line-height:1.28;letter-spacing:-.015em;margin-bottom:8px}
+h2 .req{color:var(--muted);font-weight:400}
+.help{color:var(--muted);font-size:15.5px;line-height:1.45;margin-bottom:28px}
+.lede{color:var(--muted);font-size:16.5px;line-height:1.5;margin-bottom:26px}
+.lede strong{color:#fff;font-weight:500}
+
+.opts{display:flex;flex-direction:column;gap:11px;margin-bottom:24px}
+.opt{
+  display:flex;align-items:center;gap:15px;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--border);color:#fff;
+  font:inherit;font-size:16.5px;padding:19px 22px;border-radius:999px;cursor:pointer;
+  transition:background .15s,border-color .15s;
+}
+.opt.multiline{border-radius:28px;align-items:flex-start}
+.opt:hover{background:var(--surface-hi)}
+.opt[aria-checked="true"]{border-color:var(--gold);background:#1C1608}
+.ring{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #4A4A4A;position:relative}
+.opt.multiline .ring{margin-top:2px}
+.opt[aria-checked="true"] .ring{border-color:var(--gold)}
+.opt[aria-checked="true"] .ring::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--gold)}
+
+.field{margin-bottom:22px}
+.field label{display:block;font-size:16.5px;font-weight:600;margin-bottom:8px}
+.field .sub{color:var(--muted);font-size:14.5px;line-height:1.4;margin-bottom:11px}
+.field input{
+  width:100%;background:var(--surface);border:1px solid var(--border);color:#fff;
+  font:inherit;font-size:16.5px;padding:18px 22px;border-radius:999px;
+}
+.field input::placeholder{color:#5A5A5A}
+.field input:focus{outline:none;border-color:var(--gold)}
+.check{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;cursor:pointer;font-size:16px;line-height:1.35}
+.check input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--gold);border-radius:4px}
+.check em{color:var(--muted);font-style:normal}
+
+.btn{
+  display:block;width:100%;background:var(--gold);color:#fff;border:0;border-radius:10px;
+  font:inherit;font-size:18px;font-weight:500;padding:19px;cursor:pointer;
+  text-align:center;text-decoration:none;transition:background .15s;
+}
+.btn:hover{background:var(--gold-hi)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:12px;font-size:16px}
+.btn.ghost:hover{background:var(--surface);color:#fff}
+.err{color:#E0574B;font-size:15px;margin-bottom:16px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+.privacy{border-top:1px solid #1A1A1A;margin-top:26px;padding-top:20px;color:var(--muted);font-size:14.5px;font-style:italic;line-height:1.45}
+
+.mark{text-align:center;padding:26px 0 40px}
+.mark .glyph{color:var(--gold);font-size:22px;line-height:1;letter-spacing:.2em}
+.mark .name{font-family:"Cormorant Garamond",serif;font-weight:400;font-size:42px;letter-spacing:.06em;margin-top:2px}
+.mark .sub{font-family:"Cormorant Garamond",serif;font-size:15px;letter-spacing:.36em;color:#D8D8D8;margin-top:-2px}
+
+.hero-sub{text-align:center;color:var(--muted);font-size:16.5px;font-style:italic;line-height:1.5;margin-bottom:22px}
+.hero-proof{text-align:center;font-size:17px;line-height:1.6;margin-bottom:34px}
+.hero-proof b{font-weight:600;color:#fff}
+
+.cal-wrap{margin-top:8px;border:1px solid #1E1E1E;border-radius:18px;overflow:hidden;background:#0A0A0A}
+.cal-wrap[hidden]{display:none}
+#cal-embed{min-width:320px;height:760px}
+.cal-loading{padding:34px 22px;text-align:center;color:var(--muted);font-size:15px}
+
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.confetti i{position:absolute;width:9px;height:14px;opacity:0;animation:drop linear forwards}
+@keyframes drop{0%{opacity:1;transform:translateY(-12vh) rotate(0)}100%{opacity:.9;transform:translateY(112vh) rotate(760deg)}}
+@media (prefers-reduced-motion:reduce){.confetti{display:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <button class="back" id="back" hidden aria-label="Retour">←</button>
+    <div class="phases" id="phases"></div>
+  </div>
+  <main id="main"></main>
+</div>
+<div class="confetti" id="confetti"></div>
+
+<script>
+const BRAND    = { glyph:"⌣", name:"FRONTALIER", sub:"CONSEIL" };
+const CALENDLY = "https://calendly.com/esprraphael/strategie-de-reussite-en-tant-que-frontalier-suisse";
+
+const D = {};
+const PHASES = ["Motivation","Qui êtes-vous","À très vite"];
+
+const STEPS = [
+  { id:'intro', ph:-1, kind:'intro' },
+
+  { id:'motivation', ph:0, kind:'choice',
+    q:"Qu'est-ce qui vous amène ?",
+    help:"Pour vous orienter au mieux dès votre arrivée.",
+    opts:[
+      ['postule_sans_retour',"J'ai postulé en Suisse, sans retour"],
+      ['je_commence',"Je commence tout juste"],
+      ['comprendre_systeme',"Je veux comprendre le système"],
+      ['curiosite',"Je découvre, par curiosité"]
+    ]},
+
+  { id:'email', ph:1, kind:'email', req:true,
+    q:"Quel email souhaitez-vous utiliser ?",
+    help:"C'est ici que vous recevrez le guide et les ressources sur le travail frontalier." },
+
+  { id:'situation', ph:1, kind:'choice', req:true,
+    q:"Où en êtes-vous aujourd'hui ?",
+    help:"Nous adaptons les ressources que vous recevrez à votre situation.",
+    opts:[
+      ['en_poste',"En poste en France",2],
+      ['fin_contrat',"En fin de contrat ou préavis",2],
+      ['recherche_court',"En recherche depuis moins de 6 mois",1],
+      ['recherche_long',"En recherche depuis plus de 6 mois",0]
+    ]},
+
+  { id:'distance', ph:1, kind:'choice', req:true,
+    q:"À quelle distance de la frontière habitez-vous ?",
+    help:"À titre indicatif. Au-delà d'1h30 de trajet quotidien, très peu de candidats tiennent sur la durée.",
+    opts:[
+      ['moins_1h',"Moins d'1 heure",2],
+      ['1_2h',"Entre 1 et 2 heures",1],
+      ['loin_pret',"Plus loin, mais prêt à déménager",1],
+      ['loin_fixe',"Plus loin, et je ne déménage pas",0]
+    ]},
+
+  { id:'echeance', ph:1, kind:'choice', req:true,
+    q:"Quand envisagez-vous de commencer en Suisse ?",
+    help:"Pour caler les ressources et le rythme sur votre projet.",
+    opts:[
+      ['moins_3m',"Dans moins de 3 mois",2],
+      ['3_6m',"Dans 3 à 6 mois",1],
+      ['6_12m',"Dans 6 à 12 mois",1],
+      ['pas_date',"Je ne sais pas encore",0]
+    ]},
+
+  { id:'identite', ph:1, kind:'identity', q:"Vos informations" },
+
+  { id:'rdv', ph:2, kind:'choice', req:true, price:true,
+    q:"Je ne propose pas d'accompagnement sans avoir vu votre dossier.",
+    help:"Un échange de 45 minutes pour analyser votre profil, votre canton cible et vos chances réelles.",
+    opts:[
+      ['rdv_now',"Réserver mon échange maintenant"],
+      ['rdv_later',"Plus tard, je préfère d'abord découvrir"]
+    ]},
+
+  { id:'source', ph:2, kind:'choice', optional:true,
+    q:"Une dernière chose : comment m'avez-vous connu ?",
+    help:"Facultatif, mais ça m'aide beaucoup.",
+    opts:[
+      ['post_li',"Par un post LinkedIn"],
+      ['newsletter',"Par la newsletter"],
+      ['dm',"Par un message que je vous ai envoyé"],
+      ['facebook',"Par le groupe Facebook frontaliers"],
+      ['bouche_oreille',"Par le bouche-à-oreille"],
+      ['recherche',"En faisant des recherches (Google, ChatGPT…)"],
+      ['autre',"Autre"]
+    ]},
+
+  { id:'fin', ph:3, kind:'done' }
+];
+
+let i = 0;
+const main=document.getElementById('main'), phasesEl=document.getElementById('phases'),
+      backBtn=document.getElementById('back'), confetti=document.getElementById('confetti');
+
+backBtn.onclick = () => { if(i>0){ i--; render(); } };
+
+function segment(){
+  const w={situation:{en_poste:2,fin_contrat:2,recherche_court:1,recherche_long:0},
+           distance:{moins_1h:2,'1_2h':1,loin_pret:1,loin_fixe:0},
+           echeance:{moins_3m:2,'3_6m':1,'6_12m':1,pas_date:0}};
+  const s=(w.situation[D.situation]??0)+(w.distance[D.distance]??0)+(w.echeance[D.echeance]??0);
+  if(s>=5&&D.echeance==='moins_3m') return 'chaud';
+  if(s>=3) return 'date';
+  return 'froid';
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function drawPhases(ph){
+  if(ph<0||ph>2){ phasesEl.innerHTML=''; phasesEl.style.display='none'; return; }
+  phasesEl.style.display='flex';
+  let h='';
+  for(let p=0;p<3;p++){
+    h += `<span class="node ${p<ph?'done':(p===ph?'now':'todo')}"></span>`;
+    if(p<2) h += `<span class="link ${p<ph?'done':''}"></span>`;
+  }
+  phasesEl.innerHTML = h + `<span class="phase-label">${PHASES[ph]}</span>`;
+}
+
+const ENDPOINT = "/api/lead";
+
+function push(stage){
+  if(!D.email) return;
+  try{
+    const body = JSON.stringify({...D, stage, segment:segment()});
+    if(navigator.sendBeacon){
+      navigator.sendBeacon(ENDPOINT, new Blob([body],{type:'application/json'}));
+    } else {
+      fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true});
+    }
+  }catch(e){}
+}
+
+function advance(S){
+  if(S && S.id) push(S.id);
+  if(S && S.id==='rdv' && D.rdv==='rdv_now'){
+    i = STEPS.findIndex(s=>s.id==='fin');
+  } else {
+    i++;
+  }
+  render();
+}
+
+function render(){
+  const S=STEPS[i];
+  drawPhases(S.ph);
+  backBtn.hidden = (i===0 || S.kind==='done');
+  confetti.innerHTML='';
+
+  let html='';
+
+  if(S.kind==='intro'){
+    html=`<div class="step">
+      <div class="mark">
+        <div class="glyph">${BRAND.glyph}</div>
+        <div class="name">${BRAND.name}</div>
+        <div class="sub">${BRAND.sub}</div>
+      </div>
+      <h1 style="text-align:center">Travaillez en Suisse.</h1>
+      <p class="hero-sub">Accompagnement de candidats français vers l'emploi frontalier</p>
+      <p class="hero-proof">Vous rejoignez une communauté de <b>120 000 frontaliers</b>, et un accompagnement individuel où chaque dossier est traité en direct.<br>2 minutes. Sans engagement. Sans frais d'inscription.</p>
+      <button class="btn" data-next>Découvrir l'accompagnement</button>
+      <p class="privacy">🔒 Vos données restent confidentielles et ne seront pas partagées.</p>
+    </div>`;
+  }
+
+  else if(S.kind==='choice'){
+    const price = S.price ? `<div class="opts" style="margin-bottom:22px"><div class="opt multiline" style="cursor:default;background:#0F0C05;border-color:#3A2E14"><span style="color:var(--gold);font-weight:600;font-size:16px;line-height:1.4">Appel diagnostic — 45 min, 45 €.<br><span style="color:var(--muted);font-weight:400;font-size:15px">Vous repartez avec un plan, que vous travailliez avec moi ou non. Les 45 € sont déduits si vous poursuivez.</span></span></div></div>`:'';
+    const multi = S.opts.some(o=>o[1].length>34);
+    html=`<div class="step">
+      <h2>${esc(S.q)}${S.req?' <span class="req">*</span>':''}</h2>
+      <p class="help">${esc(S.help)}</p>
+      ${price}
+      <div class="opts" role="radiogroup" aria-label="${esc(S.q)}">
+        ${S.opts.map(([v,l])=>`<button class="opt${multi?' multiline':''}" role="radio" aria-checked="${D[S.id]===v}" data-v="${v}"><span class="ring"></span><span>${esc(l)}</span></button>`).join('')}
+      </div>
+      ${S.optional?`<button class="btn ghost" data-next>Passer</button>`:''}
+    </div>`;
+  }
+
+  else if(S.kind==='email'){
+    html=`<div class="step">
+      <h2>${esc(S.q)} <span class="req">*</span></h2>
+      <p class="help">${esc(S.help)}</p>
+      <div class="field"><input type="email" id="f_email" inputmode="email" autocomplete="email" placeholder="Ex : marc.dubois@gmail.com" value="${esc(D.email||'')}"></div>
+      <p class="err" id="err"></p>
+      <button class="btn" data-submit>Suivant →</button>
+    </div>`;
+  }
+
+  else if(S.kind==='identity'){
+    html=`<div class="step">
+      <h1 style="font-size:34px;margin-bottom:26px">Vos informations</h1>
+      <div class="field">
+        <label for="f_nom">Prénom et Nom <span class="req">*</span></label>
+        <input type="text" id="f_nom" autocomplete="name" placeholder="Marc Dubois" value="${esc(D.nom||'')}">
+      </div>
+      <div class="field">
+        <label for="f_tel">Votre numéro de téléphone</label>
+        <div class="sub">Facultatif. Utile uniquement si vous souhaitez qu'on se parle.</div>
+        <input type="tel" id="f_tel" inputmode="tel" autocomplete="tel" placeholder="06 12 34 56 78" value="${esc(D.tel||'')}">
+      </div>
+      <label class="check"><input type="checkbox" id="c_cgu" ${D.cgu?'checked':''}><span>J'accepte la politique de confidentialité. <span class="req">*</span></span></label>
+      <label class="check"><input type="checkbox" id="c_news" ${D.news?'checked':''}><span>Je souhaite recevoir la newsletter sur le travail frontalier. <em>(facultatif)</em></span></label>
+      <p class="err" id="err"></p>
+      <button class="btn" data-submit>Suivant →</button>
+      <p class="privacy">🔒 Vos données restent confidentielles et ne seront pas partagées.</p>
+    </div>`;
+  }
+
+  else if(S.kind==='done'){
+    const first=(D.nom||'').split(' ')[0];
+    window.LEAD = {...D, segment:segment()};
+    console.log('[lead]', window.LEAD);
+    push('complete');
+
+    if(D.rdv==='rdv_now'){
+      html=`<div class="step">
+        <h2 style="margin-bottom:8px">Parfait${first?', '+esc(first):''}. Choisissez votre créneau.</h2>
+        <p class="help" style="margin-bottom:18px">45 minutes en visio. Le guide part sur ${esc(D.email||'votre email')} en parallèle.</p>
+        <div class="cal-wrap"><div id="cal-embed"><div class="cal-loading">Chargement des créneaux…</div></div></div>
+        <button class="btn ghost" data-restart>Refaire le parcours</button>
+      </div>`;
+    } else {
+      html=`<div class="step">
+        <div class="mark" style="padding:30px 0 34px"><div class="glyph">${BRAND.glyph}</div></div>
+        <h1 style="text-align:center">Bienvenue${first?', '+esc(first):''}.</h1>
+        <p class="lede" style="text-align:center">Votre premier email arrive d'ici quelques minutes : vous y trouverez le guide complet, le simulateur de reste à vivre et les prochaines étapes.</p>
+        <button class="btn ghost" data-restart>Refaire le parcours</button>
+      </div>`;
+    }
+  }
+
+  main.innerHTML=html;
+  window.scrollTo(0,0);
+  if(S.kind==='done'){
+    if(D.rdv==='rdv_now') mountCalendly(); else pop();
+  }
+  bind(S);
+}
+
+function calendlyURL(){
+  const p = new URLSearchParams({
+    hide_gdpr_banner: '1',
+    background_color: '000000',
+    text_color: 'ffffff',
+    primary_color: 'D0A03E'
+  });
+  if(D.nom)   p.set('name',  D.nom);
+  if(D.email) p.set('email', D.email);
+  if(D.tel)   p.set('a1',    D.tel);
+  p.set('utm_source', D.source || 'tunnel');
+  if(window.LEAD) p.set('utm_medium', window.LEAD.segment);
+  if(D.situation) p.set('utm_campaign', D.situation);
+  return CALENDLY + (CALENDLY.includes('?') ? '&' : '?') + p.toString();
+}
+
+function mountCalendly(){
+  const host = document.getElementById('cal-embed');
+  if(!host) return;
+  const url = calendlyURL();
+
+  host.innerHTML = `<p class="cal-loading" style="padding:14px 18px;font-size:13.5px;border-bottom:1px solid #1A1A1A;margin:0">
+    Le calendrier ne s'affiche pas ?
+    <a href="${url}" target="_blank" rel="noopener" style="color:var(--gold)">Ouvrir la page de réservation</a>
+  </p>`;
+
+  const f = document.createElement('iframe');
+  f.src = url;
+  f.title = "Réserver un créneau";
+  f.setAttribute('frameborder','0');
+  f.style.cssText = 'width:100%;min-width:320px;height:760px;border:0;display:block;background:#000';
+  host.appendChild(f);
+}
+
+function pop(){
+  const cols=['#D0A03E','#4FC3F7','#EC5F9A','#7ED957','#B388FF','#FFD54F','#FF7043'];
+  let h='';
+  for(let n=0;n<64;n++){
+    h+=`<i style="left:${Math.random()*100}%;background:${cols[n%cols.length]};animation-duration:${2.6+Math.random()*2.4}s;animation-delay:${Math.random()*1.1}s;border-radius:${Math.random()>.5?'50%':'2px'}"></i>`;
+  }
+  confetti.innerHTML=h;
+}
+
+function bind(S){
+  main.querySelectorAll('[data-next]').forEach(b=>b.onclick=()=>{i++;render()});
+  main.querySelector('[data-restart]')?.addEventListener('click',()=>{Object.keys(D).forEach(k=>delete D[k]);i=0;render()});
+
+  main.querySelectorAll('.opt[data-v]').forEach(b=>b.onclick=()=>{
+    D[S.id]=b.dataset.v;
+    main.querySelectorAll('.opt').forEach(o=>o.setAttribute('aria-checked','false'));
+    b.setAttribute('aria-checked','true');
+    setTimeout(()=>advance(S),180);
+  });
+
+  const sub=main.querySelector('[data-submit]');
+  if(sub) sub.onclick=()=>{
+    const err=main.querySelector('#err');
+    if(S.kind==='email'){
+      const v=main.querySelector('#f_email').value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){err.textContent="Il manque un email valide pour vous envoyer le guide.";return}
+      D.email=v;
+    }
+    if(S.kind==='identity'){
+      const n=main.querySelector('#f_nom').value.trim();
+      if(n.length<2){err.textContent="Votre prénom, au minimum.";return}
+      if(!main.querySelector('#c_cgu').checked){err.textContent="Il faut accepter la politique de confidentialité.";return}
+      D.nom=n; D.tel=main.querySelector('#f_tel').value.trim(); D.cgu=true;
+      D.news=main.querySelector('#c_news').checked;
+    }
+    push(S.id);
+    i++;render();
+  };
+
+  main.querySelector('input')?.focus({preventScroll:true});
+  main.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();sub?.click()}
+  }));
+}
+
+render();
+</script>
+</body>
+</html>
