@@ -171,7 +171,8 @@ const STEPS = [
       ['en_poste',"En poste en France",2],
       ['fin_contrat',"En fin de contrat ou préavis",2],
       ['recherche_court',"En recherche depuis moins de 6 mois",1],
-      ['recherche_long',"En recherche depuis plus de 6 mois",0]
+      ['recherche_long',"En recherche depuis plus de 6 mois",0],
+      ['deja_en_suisse',"Je travaille déjà en Suisse — je veux changer de poste ou de canton",2]
     ]},
 
   { id:'distance', ph:1, kind:'choice', req:true,
@@ -227,7 +228,7 @@ const main=document.getElementById('main'), phasesEl=document.getElementById('ph
 backBtn.onclick = () => { if(i>0){ i--; render(); } };
 
 function segment(){
-  const w={situation:{en_poste:2,fin_contrat:2,recherche_court:1,recherche_long:0},
+  const w={situation:{en_poste:2,fin_contrat:2,recherche_court:1,recherche_long:0,deja_en_suisse:3},
            distance:{moins_1h:2,'1_2h':1,loin_pret:1,loin_fixe:0},
            echeance:{moins_3m:2,'3_6m':1,'6_12m':1,pas_date:0}};
   const s=(w.situation[D.situation]??0)+(w.distance[D.distance]??0)+(w.echeance[D.echeance]??0);

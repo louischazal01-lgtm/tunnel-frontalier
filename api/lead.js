@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   // Codes du funnel -> libellés lisibles dans Brevo
   const LABELS = {
     motivation: { postule_sans_retour: "A postulé en Suisse, sans retour", je_commence: "Commence tout juste", comprendre_systeme: "Veut comprendre le système", curiosite: "Découvre par curiosité" },
-    situation: { en_poste: "En poste en France", fin_contrat: "Fin de contrat / préavis", recherche_court: "En recherche < 6 mois", recherche_long: "En recherche > 6 mois" },
+    situation: { en_poste: "En poste en France", fin_contrat: "Fin de contrat / préavis", recherche_court: "En recherche < 6 mois", recherche_long: "En recherche > 6 mois", deja_en_suisse: "Déjà en Suisse — changement de poste/canton" },
     distance: { moins_1h: "Moins d'1 heure", '1_2h': "Entre 1 et 2 heures", loin_pret: "Plus loin, prêt à déménager", loin_fixe: "Plus loin, ne déménage pas" },
     echeance: { moins_3m: "Moins de 3 mois", '3_6m': "3 à 6 mois", '6_12m': "6 à 12 mois", pas_date: "Ne sait pas encore" },
     rdv: { rdv_now: "Réserver maintenant", rdv_later: "Plus tard, découvrir d'abord" },
