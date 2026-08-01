@@ -2,8 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Devenir frontalier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devenir frontalier en Suisse — l'accompagnement pour décrocher votre emploi</title>
+<meta name="description" content="Accompagnement individuel pour candidats français visant un emploi de frontalier en Suisse : diagnostic, refonte du CV aux codes suisses, LinkedIn et préparation aux entretiens.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://deviens-frontalier.vercel.app/">
+<meta property="og:title" content="Devenir frontalier en Suisse — l'accompagnement pour décrocher votre emploi">
+<meta property="og:description" content="Diagnostic, CV aux codes suisses, LinkedIn et préparation aux entretiens. Un accompagnement individuel pour réussir votre projet frontalier.">
+<meta property="og:image" content="https://deviens-frontalier.vercel.app/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -156,7 +162,7 @@ const STEPS = [
 
   { id:'email', ph:1, kind:'email', req:true,
     q:"Quel email souhaitez-vous utiliser ?",
-    help:"C'est ici que vous recevrez le guide et les ressources sur le travail frontalier." },
+    help:"C'est l'adresse à laquelle je reviendrai vers vous." },
 
   { id:'situation', ph:1, kind:'choice', req:true,
     q:"Où en êtes-vous aujourd'hui ?",
@@ -256,6 +262,15 @@ function push(stage){
   }catch(e){}
 }
 
+function track(action){
+  if(!D.email) return;
+  try{
+    const body = JSON.stringify({email:D.email, click:action});
+    if(navigator.sendBeacon){ navigator.sendBeacon(ENDPOINT, new Blob([body],{type:'application/json'})); }
+    else { fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}); }
+  }catch(e){}
+}
+
 function advance(S){
   if(S && S.id) push(S.id);
   if(S && S.id==='rdv' && D.rdv==='rdv_now'){
@@ -290,7 +305,7 @@ function render(){
   }
 
   else if(S.kind==='choice'){
-    const price = S.price ? `<div class="opts" style="margin-bottom:22px"><div class="opt multiline" style="cursor:default;background:#0F0C05;border-color:#3A2E14"><span style="color:var(--gold);font-weight:600;font-size:16px;line-height:1.4">Appel diagnostic — 45 min, 45 €.<br><span style="color:var(--muted);font-weight:400;font-size:15px">Vous repartez avec un plan, que vous travailliez avec moi ou non. Les 45 € sont déduits si vous poursuivez.</span></span></div></div>`:'';
+    const price = S.price ? `<div class="opts" style="margin-bottom:22px"><div class="opt multiline" style="cursor:default;background:#0F0C05;border-color:#3A2E14"><span style="color:var(--gold);font-weight:600;font-size:16px;line-height:1.4">Appel diagnostic — 45 min, 90 CHF.<br><span style="color:var(--muted);font-weight:400;font-size:15px">Vous repartez avec un plan, que vous travailliez avec moi ou non. Les 90 CHF sont déduits si vous démarrez Border to Swiss dans les 15 jours.</span></span></div></div>`:'';
     const multi = S.opts.some(o=>o[1].length>34);
     html=`<div class="step">
       <h2>${esc(S.q)}${S.req?' <span class="req">*</span>':''}</h2>
@@ -342,16 +357,16 @@ function render(){
     if(D.rdv==='rdv_now'){
       html=`<div class="step">
         <h2 style="margin-bottom:8px">Parfait${first?', '+esc(first):''}. Choisissez votre créneau.</h2>
-        <p class="help" style="margin-bottom:18px">45 minutes en visio. Le guide part sur ${esc(D.email||'votre email')} en parallèle.</p>
+        <p class="help" style="margin-bottom:18px">45 minutes en visio, en tête-à-tête. Je reviens vers vous par email en parallèle.</p>
         <div class="cal-wrap"><div id="cal-embed"><div class="cal-loading">Chargement des créneaux…</div></div></div>
-        <button class="btn ghost" data-restart>Refaire le parcours</button>
+        <button class="btn ghost" data-later>Plus tard, je préfère d'abord découvrir</button>
       </div>`;
     } else {
       html=`<div class="step">
         <div class="mark" style="padding:30px 0 34px"><div class="glyph">${BRAND.glyph}</div></div>
         <h1 style="text-align:center">Bienvenue${first?', '+esc(first):''}.</h1>
-        <p class="lede" style="text-align:center">Votre premier email arrive d'ici quelques minutes : vous y trouverez le guide complet, le simulateur de reste à vivre et les prochaines étapes.</p>
-        <button class="btn ghost" data-restart>Refaire le parcours</button>
+        <p class="lede" style="text-align:center">C'est noté. Je reviens vers vous par email très vite.</p>
+        <a class="btn" id="services-link" href="/offre" rel="noopener">Découvrir mes services</a>
       </div>`;
     }
   }
@@ -410,9 +425,11 @@ function pop(){
 function bind(S){
   main.querySelectorAll('[data-next]').forEach(b=>b.onclick=()=>{i++;render()});
   main.querySelector('[data-restart]')?.addEventListener('click',()=>{Object.keys(D).forEach(k=>delete D[k]);i=0;render()});
+  main.querySelector('[data-later]')?.addEventListener('click',()=>{track('decouvre_cal');D.rdv='rdv_later';i=STEPS.findIndex(s=>s.id==='source');render()});
 
   main.querySelectorAll('.opt[data-v]').forEach(b=>b.onclick=()=>{
     D[S.id]=b.dataset.v;
+    if(S.id==='rdv') track(b.dataset.v==='rdv_now'?'rdv':'decouvre');
     main.querySelectorAll('.opt').forEach(o=>o.setAttribute('aria-checked','false'));
     b.setAttribute('aria-checked','true');
     setTimeout(()=>advance(S),180);
@@ -423,7 +440,7 @@ function bind(S){
     const err=main.querySelector('#err');
     if(S.kind==='email'){
       const v=main.querySelector('#f_email').value.trim();
-      if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){err.textContent="Il manque un email valide pour vous envoyer le guide.";return}
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){err.textContent="Il manque un email valide pour vous recontacter.";return}
       D.email=v;
     }
     if(S.kind==='identity'){
