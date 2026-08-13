@@ -37,6 +37,14 @@ a{color:inherit;text-decoration:none}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border-hi)}
 .btn.ghost:hover{background:var(--surface-2);border-color:var(--gold);transform:none}
 
+/* Bandeau d'absence — masqué par défaut, révélé par script avant la date de retour */
+.vac{
+  padding:11px 16px;text-align:center;font-size:13.5px;line-height:1.4;
+  color:var(--gold);background:rgba(208,160,62,.07);
+  border-bottom:1px solid var(--gold-dim);
+}
+.vac b{font-weight:600;color:var(--gold-hi)}
+
 header{position:sticky;top:0;z-index:50;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
 .logo{font-family:"Lexend";font-weight:400;font-size:19px;letter-spacing:.02em;display:flex;align-items:center;gap:11px}
@@ -146,6 +154,18 @@ footer{border-top:1px solid var(--border);padding:44px 0 40px;color:var(--muted)
 </style>
 </head>
 <body>
+
+<div class="vac" id="vac" hidden>
+  <b>Absent jusqu'au 18 août inclus</b> — réservation possible, je réponds dès mon retour.
+</div>
+<script>
+  /* Le bandeau se retire tout seul après la date de retour (fin de journée, heure de Paris),
+     pour éviter qu'un message d'absence périmé traîne sur le tunnel. */
+  (function () {
+    var fin = new Date("2026-08-18T23:59:59+02:00").getTime();
+    if (Date.now() <= fin) document.getElementById("vac").hidden = false;
+  })();
+</script>
 
 <header>
   <div class="wrap nav">

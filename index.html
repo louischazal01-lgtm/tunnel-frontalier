@@ -35,6 +35,14 @@ body{
 }
 .shell{width:100%;max-width:600px;min-height:100dvh;display:flex;flex-direction:column}
 
+/* Bandeau d'absence — masqué par défaut, révélé par script avant la date de retour */
+.vac{
+  padding:11px 16px;text-align:center;font-size:13.5px;line-height:1.4;
+  color:var(--gold);background:rgba(208,160,62,.07);
+  border-bottom:1px solid var(--gold-dim);
+}
+.vac b{font-weight:600;color:var(--gold-hi)}
+
 .topbar{
   position:sticky;top:0;z-index:3;background:var(--bg);
   padding:18px 16px 14px;display:flex;align-items:center;gap:10px;min-height:80px;
@@ -132,6 +140,17 @@ h2 .req{color:var(--muted);font-weight:400}
 </head>
 <body>
 <div class="shell">
+  <div class="vac" id="vac" hidden>
+    <b>Absent jusqu'au 18 août inclus</b> — réservation possible, je réponds dès mon retour.
+  </div>
+  <script>
+    /* Le bandeau se retire tout seul après la date de retour (fin de journée, heure de Paris),
+       pour éviter qu'un message d'absence périmé traîne sur le tunnel. */
+    (function () {
+      var fin = new Date("2026-08-18T23:59:59+02:00").getTime();
+      if (Date.now() <= fin) document.getElementById("vac").hidden = false;
+    })();
+  </script>
   <div class="topbar">
     <button class="back" id="back" hidden aria-label="Retour">←</button>
     <div class="phases" id="phases"></div>
