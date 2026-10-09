@@ -325,7 +325,7 @@ function render(){
   }
 
   else if(S.kind==='choice'){
-    const price = S.price ? `<div class="opts" style="margin-bottom:22px"><div class="opt multiline" style="cursor:default;background:#0F0C05;border-color:#3A2E14"><span style="color:var(--gold);font-weight:600;font-size:16px;line-height:1.4">Appel diagnostic — 45 min, 90 CHF.<br><span style="color:var(--muted);font-weight:400;font-size:15px">Vous repartez avec un plan, que vous travailliez avec moi ou non. Les 90 CHF sont déduits si vous démarrez Border to Swiss dans les 15 jours.</span></span></div></div>`:'';
+    const price = S.price ? `<div class="opts" style="margin-bottom:22px"><div class="opt multiline" style="cursor:default;background:#0F0C05;border-color:#3A2E14"><span style="color:var(--gold);font-weight:600;font-size:16px;line-height:1.4">Appel diagnostic : 45 min, 50 CHF.<br><span style="color:var(--muted);font-weight:400;font-size:15px">Vous repartez avec un plan, que vous travailliez avec moi ou non. Les 50 CHF sont déduits si vous démarrez l'accompagnement dans les 15 jours.</span></span></div></div>`:'';
     const multi = S.opts.some(o=>o[1].length>34);
     html=`<div class="step">
       <h2>${esc(S.q)}${S.req?' <span class="req">*</span>':''}</h2>
